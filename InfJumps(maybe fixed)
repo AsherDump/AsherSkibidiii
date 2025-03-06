@@ -1,0 +1,86 @@
+local gui = Instance.new("ScreenGui")
+gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local blurEffect = Instance.new("BlurEffect")
+blurEffect.Size = 0
+blurEffect.Parent = game.Lighting
+
+local jumpButton = Instance.new("TextButton")
+jumpButton.Size = UDim2.new(0, 150, 0, 50)
+jumpButton.Position = UDim2.new(0.4, 0, 0.1, 0)
+jumpButton.Text = "Infinite Jump: OFF"
+jumpButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+jumpButton.TextColor3 = Color3.new(1, 1, 1)
+jumpButton.Font = Enum.Font.SourceSansBold
+jumpButton.TextSize = 20
+jumpButton.Parent = gui
+jumpButton.Active = true
+jumpButton.Draggable = true
+
+local lockButton = Instance.new("TextButton")
+lockButton.Size = UDim2.new(0, 50, 0, 30)
+lockButton.Position = UDim2.new(0.9, -60, 0.5, -15) -- Moved to the right side
+lockButton.Text = "🔓"
+lockButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
+lockButton.TextColor3 = Color3.new(1, 1, 1)
+lockButton.Font = Enum.Font.SourceSansBold
+lockButton.TextSize = 20
+lockButton.Parent = gui
+
+local popup = Instance.new("TextLabel")
+popup.Size = UDim2.new(0.8, 0, 0, 50) 
+popup.Position = UDim2.new(0.1, 0, -0.2, 0) 
+popup.Text = "MhonAsher Made This 👑"
+popup.BackgroundTransparency = 1
+popup.TextColor3 = Color3.fromRGB(255, 255, 255)
+popup.Font = Enum.Font.SourceSansBold
+popup.TextSize = 35
+popup.Parent = gui
+
+popup.Visible = true
+for i = 0, 15, 1 do
+    blurEffect.Size = i
+    task.wait(0.03)
+end
+
+popup:TweenPosition(UDim2.new(0.1, 0, 0.4, 0), "Out", "Quad", 0.5, true)
+task.wait(2)
+popup:TweenPosition(UDim2.new(0.1, 0, -0.2, 0), "In", "Quad", 0.5, true)
+
+for i = 15, 0, -1 do
+    blurEffect.Size = i
+    task.wait(0.03)
+end
+
+popup.Visible = false
+blurEffect:Destroy()
+
+local infiniteJumpEnabled = false
+local buttonLocked = false
+local player = game.Players.LocalPlayer
+local userInputService = game:GetService("UserInputService")
+
+local function onJumpRequest()
+    if infiniteJumpEnabled then
+        local character = player.Character
+        if character and character:FindFirstChildOfClass("Humanoid") then
+            character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end
+
+jumpButton.MouseButton1Click:Connect(function()
+    infiniteJumpEnabled = not infiniteJumpEnabled
+    jumpButton.Text = infiniteJumpEnabled and "Infinite Jump: ON" or "Infinite Jump: OFF"
+    jumpButton.BackgroundColor3 = infiniteJumpEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+end)
+
+lockButton.MouseButton1Click:Connect(function()
+    buttonLocked = not buttonLocked
+    lockButton.Text = buttonLocked and "🔒" or "🔓"
+    lockButton.BackgroundColor3 = buttonLocked and Color3.fromRGB(255, 165, 0) or Color3.fromRGB(0, 0, 255)
+    
+    jumpButton.Draggable = not buttonLocked
+end)
+
+userInputService.JumpRequest:Connect(onJumpRequest)
