@@ -2,7 +2,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game.CoreGui
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 250, 0, 120)
+Frame.Size = UDim2.new(0, 250, 0, 160)
 Frame.Position = UDim2.new(0.5, -125, 0.4, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BorderSizePixel = 2
@@ -13,7 +13,7 @@ Frame.Parent = ScreenGui
 
 local TextBox = Instance.new("TextBox")
 TextBox.Size = UDim2.new(0, 200, 0, 30)
-TextBox.Position = UDim2.new(0.5, -100, 0.2, 0)
+TextBox.Position = UDim2.new(0.5, -100, 0.15, 0)
 TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 TextBox.BorderSizePixel = 1
 TextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
@@ -21,19 +21,29 @@ TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextBox.Text = "Enter Speed (16+)"
 TextBox.Parent = Frame
 
-local Button = Instance.new("TextButton")
-Button.Size = UDim2.new(0, 200, 0, 30)
-Button.Position = UDim2.new(0.5, -100, 0.6, 0)
-Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-Button.BorderSizePixel = 1
-Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
-Button.Text = "Apply"
-Button.TextColor3 = Color3.fromRGB(0, 0, 0)
-Button.Parent = Frame
+local ApplyButton = Instance.new("TextButton")
+ApplyButton.Size = UDim2.new(0, 200, 0, 30)
+ApplyButton.Position = UDim2.new(0.5, -100, 0.4, 0)
+ApplyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ApplyButton.BorderSizePixel = 1
+ApplyButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ApplyButton.Text = "Apply Speed"
+ApplyButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+ApplyButton.Parent = Frame
+
+local ResetButton = Instance.new("TextButton")
+ResetButton.Size = UDim2.new(0, 200, 0, 30)
+ResetButton.Position = UDim2.new(0.5, -100, 0.65, 0)
+ResetButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+ResetButton.BorderSizePixel = 1
+ResetButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ResetButton.Text = "Reset Speed (16)"
+ResetButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ResetButton.Parent = Frame
 
 local Message = Instance.new("TextLabel")
 Message.Size = UDim2.new(0, 200, 0, 30)
-Message.Position = UDim2.new(0.5, -100, 0.3, 0)
+Message.Position = UDim2.new(0.5, -100, 0.8, 0)
 Message.BackgroundTransparency = 1
 Message.TextColor3 = Color3.fromRGB(255, 255, 255)
 Message.Text = "SkibidiAsher was here"
@@ -54,7 +64,10 @@ spawn(function()
     end
 end)
 
-Button.MouseButton1Click:Connect(function()
+local RunService = game:GetService("RunService")
+local speedConnection
+
+ApplyButton.MouseButton1Click:Connect(function()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -62,15 +75,29 @@ Button.MouseButton1Click:Connect(function()
     if humanoid then
         local newSpeed = tonumber(TextBox.Text)
         if newSpeed and newSpeed > 16 then
-            -- Instead of setting WalkSpeed directly, use velocity manipulation
             local hrp = character:FindFirstChild("HumanoidRootPart")
             if hrp then
-                game:GetService("RunService").RenderStepped:Connect(function()
+                if speedConnection then speedConnection:Disconnect() end
+                speedConnection = RunService.RenderStepped:Connect(function()
                     if humanoid.MoveDirection.Magnitude > 0 then
                         hrp.Velocity = humanoid.MoveDirection * newSpeed
                     end
                 end)
             end
+        end
+    end
+end)
+
+ResetButton.MouseButton1Click:Connect(function()
+    if speedConnection then speedConnection:Disconnect() end
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid then
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.Velocity = Vector3.new(0, 0, 0) -- Stop any velocity modifications
         end
     end
 end)
