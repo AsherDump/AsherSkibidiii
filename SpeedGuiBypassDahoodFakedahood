@@ -1,0 +1,76 @@
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 250, 0, 120)
+Frame.Position = UDim2.new(0.5, -125, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 2
+Frame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0, 200, 0, 30)
+TextBox.Position = UDim2.new(0.5, -100, 0.2, 0)
+TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.BorderSizePixel = 1
+TextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.Text = "Enter Speed (16+)"
+TextBox.Parent = Frame
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 200, 0, 30)
+Button.Position = UDim2.new(0.5, -100, 0.6, 0)
+Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Button.BorderSizePixel = 1
+Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Button.Text = "Apply"
+Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+Button.Parent = Frame
+
+local Message = Instance.new("TextLabel")
+Message.Size = UDim2.new(0, 200, 0, 30)
+Message.Position = UDim2.new(0.5, -100, 0.3, 0)
+Message.BackgroundTransparency = 1
+Message.TextColor3 = Color3.fromRGB(255, 255, 255)
+Message.Text = "SkibidiAsher was here"
+Message.TextTransparency = 1
+Message.Font = Enum.Font.SourceSansBold
+Message.TextSize = 20
+Message.Parent = ScreenGui
+
+spawn(function()
+    for i = 1, 50 do
+        Message.TextTransparency = 1 - (i / 50)
+        wait(0.02)
+    end
+    wait(1)
+    for i = 1, 50 do
+        Message.TextTransparency = i / 50
+        wait(0.02)
+    end
+end)
+
+Button.MouseButton1Click:Connect(function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if humanoid then
+        local newSpeed = tonumber(TextBox.Text)
+        if newSpeed and newSpeed > 16 then
+            -- Instead of setting WalkSpeed directly, use velocity manipulation
+            local hrp = character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                game:GetService("RunService").RenderStepped:Connect(function()
+                    if humanoid.MoveDirection.Magnitude > 0 then
+                        hrp.Velocity = humanoid.MoveDirection * newSpeed
+                    end
+                end)
+            end
+        end
+    end
+end)
