@@ -1,0 +1,75 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+local player = game.Players.LocalPlayer
+local backpack = player:FindFirstChild("Backpack")
+
+if not backpack then
+    repeat task.wait() backpack = player:FindFirstChild("Backpack") until backpack
+end
+
+local function giveTool()
+    if not backpack:FindFirstChild("Speed Tool") then
+        local tool = Instance.new("Tool")
+        tool.Name = "Speed Tool"
+        tool.RequiresHandle = false
+        tool.Parent = backpack
+
+        tool.Equipped:Connect(function()
+            local character = player.Character or player.CharacterAdded:Wait()
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 200
+            end
+        end)
+
+        tool.Unequipped:Connect(function()
+            local character = player.Character
+            if character then
+                local humanoid = character:FindFirstChildOfClass("Humanoid")
+                if humanoid then
+                    humanoid.WalkSpeed = 16
+                end
+            end
+        end)
+    end
+end
+
+giveTool() -- Give tool on script execution
+
+player.CharacterAdded:Connect(function()
+    task.wait(0.5) -- Small delay to allow loading
+    backpack = player:FindFirstChild("Backpack")
+    if backpack then
+        giveTool() -- Re-give tool after respawn
+    end
+end)
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "SkibidiMessage"
+gui.ResetOnSpawn = false
+gui.Parent = player:FindFirstChildOfClass("PlayerGui")
+
+local text = Instance.new("TextLabel")
+text.Parent = gui
+text.Size = UDim2.new(0, 200, 0, 50)
+text.Position = UDim2.new(1, -210, 0.5, -25)
+text.BackgroundTransparency = 0.5
+text.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+text.TextColor3 = Color3.fromRGB(255, 255, 255)
+text.Text = "SkibidiAsher was here"
+text.Font = Enum.Font.SourceSansBold
+text.TextSize = 20
+text.TextTransparency = 1 -- Start fully invisible
+
+for i = 1, 10 do
+    text.TextTransparency = 1 - (i / 10)
+    task.wait(0.05)
+end
+
+task.wait(3) -- Wait 3 seconds
+
+for i = 1, 10 do
+    text.TextTransparency = i / 10
+    task.wait(0.05)
+end
+
+gui:Destroy()
